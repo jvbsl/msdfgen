@@ -22,7 +22,6 @@ jobs:
         mkdir bin/minimal
         mkdir bin/openmp
         mkdir tools
-
     - name: Install VCPKG
       run: |
         git clone https://github.com/microsoft/vcpkg
@@ -41,7 +40,7 @@ jobs:
     - name: Build minimal
       run: |
         cmake ../.. -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON -DMSDFGEN_USE_CPP11=ON
-        cmake --build . --config Release -- -j 3
+        cmake --build . --config Release -j 3
         zip
       working-directory: ./bin/minimal
     - name: Create minimal package
