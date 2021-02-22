@@ -17,13 +17,27 @@ jobs:
         os: [ubuntu-latest, windows-latest]
 
     steps:
+    - name: Read Tag
+      run: |
+        echo "RELEASE_VERSION=$(git describe --tags)" >> $GITHUB_ENV
+        echo $GITHUB_ENV
     - name: Create build directories
       run: |
         mkdir minimal
         mkdir openmp
-      working-directory: bin
+      working-directory: ./bin
     - name: Build minimal
       run: |
         cmake ../.. -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON -DMSDFGEN_USE_CPP11=ON
         cmake --build . --config Release -- -j 3
-      working-directory: bin/minimal
+        zip
+      working-directory: ./bin/minimal
+    - name: Create minimal package
+      run: |
+        mkdir complete
+        cp msdfgen* complete/
+      working-directory: ./bin/minimal
+    - uses: actions/upload-artifact@v2
+      with:
+      name: msdfgen-${{ env.RELEASE_VERSION }}-minimal
+      path: bin/minimal/complete
