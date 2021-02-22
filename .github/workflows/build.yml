@@ -16,6 +16,17 @@ jobs:
         os: [ubuntu-latest, windows-latest]
 
     steps:
+    - name: Install VCPKG
+      # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
+      uses: lukka/run-vcpkg@v6
+      with:
+        setupOnly: true
+      if: matrix.os == 'windows-latest'
+    - name: Install Windows dependencies
+      run: |
+        $VCPKG_ROOT/vcpkg install freetype
+      shell: bash
+      if: matrix.os == 'windows-latest'
     - uses: actions/checkout@v1
     - name: Read Tag
       run: |
@@ -26,6 +37,7 @@ jobs:
         mkdir minimal
         mkdir openmp
       working-directory: ./bin
+
     - name: Build minimal
       run: |
         cmake ../.. -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON -DMSDFGEN_USE_CPP11=ON
@@ -35,9 +47,11 @@ jobs:
     - name: Create minimal package
       run: |
         mkdir complete
-        cp msdfgen* complete/
+        cp msdfgen complete/
+        cp msdfgen.exe complete/
       working-directory: ./bin/minimal
+      shell: bash
     - uses: actions/upload-artifact@v2
       with:
-        name: msdfgen-${{ env.RELEASE_VERSION }}-minimal
+        name: msdfgen-${{ env.RELEASE_VERSION }}-minimal.zip
         path: bin/minimal/complete
