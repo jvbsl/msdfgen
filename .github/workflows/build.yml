@@ -17,28 +17,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Create build directories
+      run: |
+        mkdir bin/minimal
+        mkdir bin/openmp
+        mkdir tools
+
     - name: Install VCPKG
-      # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
-      uses: lukka/run-vcpkg@v6
-      with:
-        setupOnly: true
-        vcpkgGitCommitId: ec6fe06
+      run: |
+        git clone https://github.com/microsoft/vcpkg
+        bootstrap-vcpkg.bat
+      working-directory: tools
       if: matrix.os == 'windows-latest'
     - name: Install Windows dependencies
       run: |
-        $VCPKG_ROOT/vcpkg install freetype
+        tools/vcpkg/vcpkg install freetype
       shell: bash
       if: matrix.os == 'windows-latest'
     - name: Read Tag
       run: |
         echo "RELEASE_VERSION=$(git describe --tags)" >> $GITHUB_ENV
         echo $GITHUB_ENV
-    - name: Create build directories
-      run: |
-        mkdir minimal
-        mkdir openmp
-      working-directory: ./bin
-
     - name: Build minimal
       run: |
         cmake ../.. -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON -DMSDFGEN_USE_CPP11=ON
