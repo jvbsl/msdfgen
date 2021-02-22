@@ -8,6 +8,11 @@ option(MSDFGEN_USE_SKIA "Build with the Skia library" OFF)
 option(FREETYPE_WITH_PNG "Link libpng and zlib because FreeType is configured to require it" OFF)
 option(FREETYPE_WITH_HARFBUZZ "Link HarfBuzz because FreeType is configured to require it" OFF)
 
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake")
+  include("${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake")
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Freetype REQUIRED)
