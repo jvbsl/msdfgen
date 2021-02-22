@@ -47,8 +47,8 @@ jobs:
     - name: Create minimal package
       run: |
         mkdir complete
-        cp msdfgen complete/ | true
-        cp msdfgen.exe complete/ | true
+        cp msdfgen complete/ 2>/dev/null || :
+        cp msdfgen.exe complete/ 2>/dev/null || :
       working-directory: ./bin/minimal
       shell: bash
     - uses: actions/upload-artifact@v2
