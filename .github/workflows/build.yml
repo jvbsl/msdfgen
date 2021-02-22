@@ -16,6 +16,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
 
     steps:
+    - uses: actions/checkout@v1
     - name: Install VCPKG
       # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
       uses: lukka/run-vcpkg@v6
@@ -27,7 +28,6 @@ jobs:
         $VCPKG_ROOT/vcpkg install freetype
       shell: bash
       if: matrix.os == 'windows-latest'
-    - uses: actions/checkout@v1
     - name: Read Tag
       run: |
         echo "RELEASE_VERSION=$(git describe --tags)" >> $GITHUB_ENV
@@ -47,8 +47,8 @@ jobs:
     - name: Create minimal package
       run: |
         mkdir complete
-        cp msdfgen complete/
-        cp msdfgen.exe complete/
+        cp msdfgen complete/ | true
+        cp msdfgen.exe complete/ | true
       working-directory: ./bin/minimal
       shell: bash
     - uses: actions/upload-artifact@v2
