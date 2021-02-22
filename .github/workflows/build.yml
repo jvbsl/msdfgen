@@ -38,5 +38,5 @@ jobs:
       working-directory: ./bin/minimal
     - uses: actions/upload-artifact@v2
       with:
-      name: msdfgen-${{ env.RELEASE_VERSION }}-minimal
-      path: bin/minimal/complete
+        name: msdfgen-${{ env.RELEASE_VERSION }}-minimal
+        path: bin/minimal/complete
