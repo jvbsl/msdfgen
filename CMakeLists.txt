@@ -10,7 +10,7 @@ option(FREETYPE_WITH_HARFBUZZ "Link HarfBuzz because FreeType is configured to r
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-find_package(Freetype CONFIG REQUIRED)
+find_package(Freetype REQUIRED)
 
 #----------------------------------------------------------------
 # Gathering File
