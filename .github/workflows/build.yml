@@ -26,7 +26,7 @@ jobs:
     - name: Install VCPKG
       run: |
         git clone https://github.com/microsoft/vcpkg
-        bootstrap-vcpkg.bat
+        ./vcpkg/bootstrap-vcpkg.bat
       working-directory: tools
       if: matrix.os == 'windows-latest'
     - name: Install Windows dependencies
