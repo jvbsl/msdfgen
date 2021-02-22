@@ -1,0 +1,29 @@
+name: msdfgen Build
+
+on:
+  workflow_dispatch:
+    inputs:
+  push:
+    branches:
+      - master
+      - feature/automated-build
+jobs:
+  build:
+    env:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix: 
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Create build directories
+      run: |
+        mkdir minimal
+        mkdir openmp
+      working-directory: bin
+    - name: Build minimal
+      run: |
+        cmake ../.. -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON -DMSDFGEN_USE_CPP11=ON
+        cmake --build . --config Release -- -j 3
+      working-directory: bin/minimal
