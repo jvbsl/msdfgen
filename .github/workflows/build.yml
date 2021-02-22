@@ -31,7 +31,7 @@ jobs:
     - name: Install Windows dependencies
       run: |
         tools/vcpkg/vcpkg install freetype
-        tools/vcpkg/vcpkg install freetype:x64
+        tools/vcpkg/vcpkg install freetype:x64-windows
       shell: bash
       if: matrix.os == 'windows-latest'
     - name: Read Tag
