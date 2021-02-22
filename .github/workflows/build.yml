@@ -9,7 +9,6 @@ on:
       - feature/automated-build
 jobs:
   build:
-    env:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
