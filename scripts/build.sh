@@ -74,10 +74,10 @@ Build() {
     cp $BUILD_DIR_PREFIX/msdfgen$executable_suffix ../complete/$OUTPUT_NAME/
     case $platform_suffix in
     "win")
-        zip ../complete/$OUTPUT_NAME.zip ../complete/*
+        zip ../complete/$OUTPUT_NAME.zip ../complete/$OUTPUT_NAME/*
         ;;
     "linux")
-        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/*
+        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/$OUTPUT_NAME/*
         ;;
     esac
 }
