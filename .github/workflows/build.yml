@@ -46,6 +46,7 @@ jobs:
     - name: Create minimal package
       run: |
         mkdir complete
+        ls .
         cp msdfgen complete/ 2>/dev/null || :
         cp msdfgen.exe complete/ 2>/dev/null || :
       working-directory: ./bin/minimal
