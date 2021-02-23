@@ -17,47 +17,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Create build directories
+    - name: Install dependencies
       run: |
-        mkdir bin/minimal
-        mkdir bin/openmp
-        mkdir tools
-    - name: Install VCPKG
-      run: |
-        git clone https://github.com/microsoft/vcpkg
-        ./vcpkg/bootstrap-vcpkg.bat
-      working-directory: tools
-      if: matrix.os == 'windows-latest'
-    - name: Install Windows dependencies
-      run: |
-        tools/vcpkg/vcpkg install freetype
-        tools/vcpkg/vcpkg install freetype:x64-windows
-        tools/vcpkg/vcpkg integrate install
+        ./dependencies.sh
       shell: bash
+      working-directory: scripts
+    - name: Build
+      run: |
+        ./build.sh
+      working-directory: ./scripts
+    - name: Collect artifacts Windows
+      run: |
+        echo "ARTIFACT_DIRS=$(ls)" >> $env:GITHUB_ENV
       if: matrix.os == 'windows-latest'
-    - name: Build minimal
+    - name: Collect artifacts Linux
       run: |
-        cmake ../.. -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON -DMSDFGEN_USE_CPP11=ON
-        cmake --build . --config Release -j 3
-      working-directory: ./bin/minimal
-    - name: Create minimal package
-      run: |
-        mkdir complete
-        cp msdfgen complete/ 2>/dev/null || :
-        cp Release/msdfgen.exe complete/ 2>/dev/null || :
-      working-directory: ./bin/minimal
-      shell: bash
-    - name: Set artifact name Windows
-      run: |
-        echo "RELEASE_VERSION=$(git describe --tags)" >> $env:GITHUB_ENV
-        echo "OS_PREFIX_SHORT=win" >> $env:GITHUB_ENV
-      if: matrix.os == 'windows-latest'
-    - name: Set artifact name Linux
-      run: |
-        echo "RELEASE_VERSION=$(git describe --tags)" >> $GITHUB_ENV
-        echo "OS_PREFIX_SHORT=linux" >> $GITHUB_ENV
+        echo "ARTIFACT_DIRS=$(ls)" >> $GITHUB_ENV
       if: matrix.os == 'ubuntu-latest'
     - uses: actions/upload-artifact@v2
       with:
-        name: msdfgen-${{ env.RELEASE_VERSION }}-${{ env.OS_PREFIX_SHORT }}-minimal.zip
-        path: bin/minimal/complete
+        name: ${{ env.ARTIFACT_DIRS }}.zip
+        path: bin/complete/${{ env.ARTIFACT_DIRS }}
