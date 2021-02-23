@@ -72,6 +72,13 @@ Build() {
     cmake --build . --config Release -j 4
     mkdir ../complete/$OUTPUT_NAME/ 2> /dev/null | true
     cp $BUILD_DIR_PREFIX/msdfgen$executable_suffix ../complete/$OUTPUT_NAME/
+    case $platform_suffix in
+    "win")
+        zip ../complete/$OUTPUT_NAME.zip ../complete/*
+    "linux")
+        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/
+        ;;
+    esac
 }
 
 #Minimal builds
