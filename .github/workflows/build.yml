@@ -31,12 +31,12 @@ jobs:
         echo "ARTIFACT_DIRS=$(ls -d $PWD/* | xargs)" >> $env:GITHUB_ENV
       working-directory: ./bin/complete/
       if: matrix.os == 'windows-latest'
-    - name: Collect artifacts Linux
-      run: |
-        echo "ARTIFACT_DIRS=$(ls -d $PWD/* | xargs)" >> $GITHUB_ENV
-      working-directory: ./bin/complete/
-      if: matrix.os == 'ubuntu-latest'
+#    - name: Collect artifacts Linux
+#      run: |
+#        echo "ARTIFACT_DIRS=$(ls -d $PWD/* | xargs)" >> $GITHUB_ENV
+#      working-directory: ./bin/complete/
+#      if: matrix.os == 'ubuntu-latest'
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.ARTIFACT_DIRS }}.zip
-        path: ${{ env.ARTIFACT_DIRS }}
+        name: artifacts
+        path: bin/complete/*
