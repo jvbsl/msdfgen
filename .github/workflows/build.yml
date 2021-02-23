@@ -43,4 +43,6 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: artifacts
-        path: bin/complete/*.tar.gz bin/complete/*.zip
+        path: |
+          bin/complete/*.tar.gz
+          bin/complete/*.zip
