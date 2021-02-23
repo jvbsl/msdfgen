@@ -77,7 +77,7 @@ Build() {
         zip ../complete/$OUTPUT_NAME.zip ../complete/*
         ;;
     "linux")
-        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/
+        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/*
         ;;
     esac
 }
