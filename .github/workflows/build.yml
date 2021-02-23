@@ -43,10 +43,3 @@ jobs:
       with:
         name: artifacts
         path: bin/complete/*
-    - uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
-        files: |
-          bin/complete/*
-      if: ${{ secrets.IS_RELEASE_TAG }}=='True'
