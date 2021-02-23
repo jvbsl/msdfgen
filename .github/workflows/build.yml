@@ -46,9 +46,9 @@ jobs:
     - name: Create minimal package
       run: |
         mkdir complete
-        ls .
+        ls Release
         cp msdfgen complete/ 2>/dev/null || :
-        cp msdfgen.exe complete/ 2>/dev/null || :
+        cp x64/msdfgen.exe complete/ 2>/dev/null || :
       working-directory: ./bin/minimal
       shell: bash
     - name: Set artifact name Windows
