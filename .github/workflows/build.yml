@@ -38,7 +38,6 @@ jobs:
     - name: Read Tag
       run: |
         echo "RELEASE_VERSION=$(git describe --tags)" >> $GITHUB_ENV
-        echo $GITHUB_ENV
     - name: Build minimal
       run: |
         cmake ../.. -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON -DMSDFGEN_USE_CPP11=ON
@@ -51,7 +50,15 @@ jobs:
         cp msdfgen.exe complete/ 2>/dev/null || :
       working-directory: ./bin/minimal
       shell: bash
+    - name: Set artifact name Windows
+      run: |
+        echo "OS_PREFIX_SHORT=win" >> $GITHUB_ENV
+      if: matrix.os == 'windows-latest'
+    - name: Set artifact name Linux
+      run: |
+        echo "OS_PREFIX_SHORT=linux" >> $GITHUB_ENV
+      if: matrix.os == 'ubuntu-latest'
     - uses: actions/upload-artifact@v2
       with:
-        name: msdfgen-${{ env.RELEASE_VERSION }}-minimal.zip
+        name: msdfgen-${{ env.RELEASE_VERSION }}-${{ env.OS_PREFIX_SHORT }}-minimal.zip
         path: bin/minimal/complete
