@@ -75,6 +75,7 @@ Build() {
     case $platform_suffix in
     "win")
         zip ../complete/$OUTPUT_NAME.zip ../complete/*
+        ;;
     "linux")
         tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/
         ;;
