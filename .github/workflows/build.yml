@@ -26,6 +26,7 @@ jobs:
       run: |
         ./build.sh
       working-directory: ./scripts
+      shell: bash
 #    - name: Collect artifacts Windows
 #      run: |
 #        echo "ARTIFACT_DIRS=$(ls -d $PWD/* | xargs)" >> $env:GITHUB_ENV
