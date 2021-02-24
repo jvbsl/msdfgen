@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    outputs:
+      RELEASE_TAG_VERSION: ${{ steps.release_prep.outputs.RELEASE_TAG_VERSION }}
+      IS_RELEASE_TAG: ${{ steps.release_prep.outputs.IS_RELEASE_TAG }}
     strategy:
       fail-fast: false
       matrix: 
@@ -33,6 +36,16 @@ jobs:
         path: |
           bin/complete/*.tar.gz
           bin/complete/*.zip
+    - name: Prepare for Release
+      id: release_prep
+      run: |
+        git describe --exact-match --tags HEAD 2> /dev/null &&  IS_RELEASE_TAG=True
+        RELEASE_TAG_VERSION=$(git describe --tag)
+        
+        echo "::set-output name=RELEASE_TAG_VERSION::$RELEASE_TAG_VERSION"
+        echo "::set-output name=IS_RELEASE_TAG::$IS_RELEASE_TAG"
+        
+      shell: bash
 #    - name: Collect artifacts Windows
 #      run: |
 #        echo "ARTIFACT_DIRS=$(ls -d $PWD/* | xargs)" >> $env:GITHUB_ENV
@@ -47,24 +60,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-    - name: Prepare for Release
-      run: |
-        git describe --exact-match --tags HEAD 2> /dev/null &&  echo "IS_RELEASE_TAG=True" >> $GITHUB_ENV || true
-        echo "RELEASE_TAG_VERSION=$(git describe --tag)" >> $GITHUB_ENV
-      shell: bash
     - name: Check release
       run: |
-        echo "Is release: ${{ env.IS_RELEASE_TAG }}"
+        echo "Is release: ${{ needs.build.outputs.IS_RELEASE_TAG }}"
       shell: bash
     - uses: actions/download-artifact@v2
       with:
         name: artifacts
         path: artifacts
     - uses: "marvinpinto/action-automatic-releases@latest"
-      if: env.IS_RELEASE_TAG=='True'
+      if: needs.build.outputs.IS_RELEASE_TAG=='True'
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
-        automatic_release_tag: "${{ env.RELEASE_TAG_VERSION }}"
+        automatic_release_tag: "${{ needs.build.outputs.RELEASE_TAG_VERSION }}"
         files: |
           artifacts/*
