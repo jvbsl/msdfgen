@@ -1,3 +1,5 @@
+## Version 1.8.6 (2021-02-24)
+- Just some automatic build testing
 
 ## Version 1.8 (2020-10-17)
 
