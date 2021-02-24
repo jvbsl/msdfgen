@@ -80,7 +80,7 @@ Build() {
         ;;
     *) # Default to tar
         pushd ../complete/$OUTPUT_NAME
-        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz * || return $?
+        tar -zcvf ../$OUTPUT_NAME.tar.gz * || return $?
         popd
         ;;
     esac
