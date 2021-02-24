@@ -48,7 +48,7 @@ Build() {
     OUTPUT_NAME="msdf-${Configuration}-${version}-${platform_suffix}-${Arch}"
     BUILD_DIR_PREFIX="."
     
-    Generator="Unix Makefiles" ;; # Default to unix makefiles
+    Generator="Unix Makefiles" # Default to unix makefiles
     case $platform_suffix in
         "win") 
             case $Arch in
@@ -56,12 +56,14 @@ Build() {
                 "x86") GeneratorArch="-A Win32" ;;
             esac
             BUILD_DIR_PREFIX="Release"
-            Generator="Visual Studio 16" ;;
+            Generator="Visual Studio 16"
+            ;;
         "linux")
             case $Arch in
                 "x64") GeneratorArch="-m 64" ;;
                 "x86") GeneratorArch="-m 32" ;;
             esac
+            ;;
     esac
     case $Configuration in
         "minimal") PARAMS="" ;;
