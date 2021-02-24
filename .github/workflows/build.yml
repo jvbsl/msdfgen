@@ -45,4 +45,5 @@ jobs:
       with:
         name: artifacts
         path: |
-          bin/complete/*.*
+          bin/complete/*.tar.gz
+          bin/complete/*.zip
