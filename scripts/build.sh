@@ -74,7 +74,7 @@ Build() {
     cp $BUILD_DIR_PREFIX/msdfgen$executable_suffix ../complete/$OUTPUT_NAME/
     case $platform_suffix in
     "win")
-        tar -xf ../complete/$OUTPUT_NAME.zip ../complete/$OUTPUT_NAME/* || return $?
+        powershell "Compress-Archive ../complete/$OUTPUT_NAME/* ../complete/$OUTPUT_NAME.zip" || return $?
         ;;
     "linux")
         tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/$OUTPUT_NAME/* || return $?
