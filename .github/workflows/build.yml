@@ -38,7 +38,9 @@ jobs:
 #      working-directory: ./bin/complete/
 #      if: matrix.os == 'ubuntu-latest'
     - name: Prepare for Release
-      run: git describe --exact-match --tags HEAD 2> /dev/null &&  echo "IS_RELEASE_TAG='True'" >> $GITHUB_ENV || true
+      run: |
+        git describe --exact-match --tags HEAD 2> /dev/null &&  echo "IS_RELEASE_TAG='True'" >> $GITHUB_ENV || true
+        echo "RELEASE_TAG_VERSION=$(git describe --tag)" >> $GITHUB_ENV
       shell: bash
       if: matrix.os == 'windows-latest'
     - uses: actions/upload-artifact@v2
@@ -48,9 +50,10 @@ jobs:
           bin/complete/*.tar.gz
           bin/complete/*.zip
     - uses: "marvinpinto/action-automatic-releases@latest"
+      if: env.IS_RELEASE_TAG=='True'
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
+        automatic_release_tag: "${{ env.RELEASE_TAG_VERSION }}"
         files: |
           bin/complete/*
-      if: ${{ env.IS_RELEASE_TAG }}=='True'
