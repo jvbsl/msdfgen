@@ -37,6 +37,9 @@ jobs:
 #        echo "ARTIFACT_DIRS=$(ls -d $PWD/* | xargs)" >> $GITHUB_ENV
 #      working-directory: ./bin/complete/
 #      if: matrix.os == 'ubuntu-latest'
+  release:
+    runs-on: ubuntu-latest
+    needs: build
     - name: Prepare for Release
       run: |
         git describe --exact-match --tags HEAD 2> /dev/null &&  echo "IS_RELEASE_TAG=True" >> $GITHUB_ENV || true
