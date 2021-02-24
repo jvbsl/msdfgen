@@ -68,16 +68,16 @@ Build() {
         "openmp") PARAMS="-DMSDFGEN_USE_OPENMP=ON" ;;
     esac
 
-    cmake -DCMAKE_BUILD_TYPE=Release -G "$Generator" $GeneratorArch ../.. -DMSDFGEN_USE_CPP11=ON -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON $PARAMS
-    cmake --build . --config Release -j 4
+    cmake -DCMAKE_BUILD_TYPE=Release -G "$Generator" $GeneratorArch ../.. -DMSDFGEN_USE_CPP11=ON -DMSDFGEN_BUILD_MSDFGEN_STANDALONE=ON $PARAMS || return $?
+    cmake --build . --config Release -j 4 || return $?
     mkdir ../complete/$OUTPUT_NAME/ 2> /dev/null | true
     cp $BUILD_DIR_PREFIX/msdfgen$executable_suffix ../complete/$OUTPUT_NAME/
     case $platform_suffix in
     "win")
-        zip ../complete/$OUTPUT_NAME.zip ../complete/$OUTPUT_NAME/*
+        tar -xf ../complete/$OUTPUT_NAME.zip ../complete/$OUTPUT_NAME/* || return $?
         ;;
     "linux")
-        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/$OUTPUT_NAME/*
+        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/$OUTPUT_NAME/* || return $?
         ;;
     esac
 }
@@ -85,23 +85,23 @@ Build() {
 #Minimal builds
 
 cd minimal
-Build "x64" "minimal"
+Build "x64" "minimal" || exit $?
 cd ..
 
 if [ "$use_32_bit" = true ] ; then
     cd minimal32
-    Build "x86" "minimal"
+    Build "x86" "minimal" || exit $?
     cd ..
 fi
 
 # OpenMP builds
 
 cd openmp
-Build "x64" "openmp"
+Build "x64" "openmp" || exit $?
 cd ..
 
 if [ "$use_32_bit" = true ] ; then
     cd openmp32
-    Build "x86" "openmp"
+    Build "x86" "openmp" || exit $?
     cd ..
 fi
