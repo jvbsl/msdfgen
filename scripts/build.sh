@@ -48,6 +48,7 @@ Build() {
     OUTPUT_NAME="msdf-${Configuration}-${version}-${platform_suffix}-${Arch}"
     BUILD_DIR_PREFIX="."
     
+    Generator="Unix Makefiles" ;; # Default to unix makefiles
     case $platform_suffix in
         "win") 
             case $Arch in
@@ -61,7 +62,6 @@ Build() {
                 "x64") GeneratorArch="-m 64" ;;
                 "x86") GeneratorArch="-m 32" ;;
             esac
-            Generator="Unix Makefiles" ;;
     esac
     case $Configuration in
         "minimal") PARAMS="" ;;
@@ -76,7 +76,7 @@ Build() {
     "win")
         powershell "Compress-Archive ../complete/$OUTPUT_NAME/* ../complete/$OUTPUT_NAME.zip" || return $?
         ;;
-    "linux")
+    *) # Default to tar
         tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/$OUTPUT_NAME/* || return $?
         ;;
     esac
