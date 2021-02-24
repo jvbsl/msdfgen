@@ -79,7 +79,9 @@ Build() {
         powershell "Compress-Archive ../complete/$OUTPUT_NAME/* ../complete/$OUTPUT_NAME.zip" || return $?
         ;;
     *) # Default to tar
-        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz ../complete/$OUTPUT_NAME/* || return $?
+        pushd ../complete/$OUTPUT_NAME
+        tar -zcvf ../complete/$OUTPUT_NAME.tar.gz * || return $?
+        popd
         ;;
     esac
 }
