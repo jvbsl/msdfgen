@@ -14,6 +14,6 @@ case $platform_suffix in
         vcpkg/vcpkg integrate install
         ;;
     "mac")
-        brew install freetype
+        brew install libomp
         ;;
 esac
