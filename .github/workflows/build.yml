@@ -41,7 +41,7 @@ jobs:
       run: |
         git describe --exact-match --tags HEAD 2> /dev/null &&  echo "IS_RELEASE_TAG='True'" >> $GITHUB_ENV || true
         echo "RELEASE_TAG_VERSION=$(git describe --tag)" >> $GITHUB_ENV
-        echo "Is release: ${{ env.IS_RELEASE_TAG }}"
+        echo "Is release: $IS_RELEASE_TAG"
       shell: bash
       if: matrix.os == 'windows-latest'
     - uses: actions/upload-artifact@v2
