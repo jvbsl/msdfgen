@@ -5,6 +5,16 @@
  * A utility by Viktor Chlumsky, (c) 2014 - 2020
  *
  */
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    #ifdef MSDFGEN_SHARED
+        #define DLL_EXPORT __declspec(dllexport)
+    #else
+        #define DLL_EXPORT __declspec(dllimport)
+    #endif
+#else
+    #define DLL_EXPORT 
+#endif
+
 
 #define _USE_MATH_DEFINES
 #define _CRT_SECURE_NO_WARNINGS
@@ -128,53 +138,53 @@ typedef void (*edgeColoringFunc_t)(msdfgen::Shape &, double, unsigned long long)
 #ifdef __cplusplus
 extern "C" {
 #endif
-    bool MSDF_Shape_LoadFromFontFile(msdfgen::Shape& shape, const char* fontFileName, msdfgen::GlyphIndex glyphIndex, msdfgen::unicode_t unicode);
-    bool MSDF_Shape_LoadFromSVGFile(msdfgen::Shape& shape, const char* svgFileName, int svgPathIndex);
-    bool MSDF_Shape_LoadFromDescriptionFile(msdfgen::Shape& shape, const char* descriptionFile, bool* skipColoring);
-    bool MSDF_Shape_PreprocessGeometry(msdfgen::Shape& shape);
-    bool MSDF_Shape_Validate(msdfgen::Shape& shape);
-    bool MSDF_Shape_Export(msdfgen::Shape& shape, const char* fileName);
-    void MSDF_Shape_Normalize(msdfgen::Shape& shape);
-    void MSDF_Shape_FlipY(msdfgen::Shape& shape, bool flipped);
-    bool MSDF_Shape_LoadFromFreetypeFont(msdfgen::Shape& shape, msdfgen::FontHandle *font, msdfgen::GlyphIndex glyphIndex, msdfgen::unicode_t unicode);
+    DLL_EXPORT bool MSDF_Shape_LoadFromFontFile(msdfgen::Shape& shape, const char* fontFileName, msdfgen::GlyphIndex glyphIndex, msdfgen::unicode_t unicode);
+    DLL_EXPORT bool MSDF_Shape_LoadFromSVGFile(msdfgen::Shape& shape, const char* svgFileName, int svgPathIndex);
+    DLL_EXPORT bool MSDF_Shape_LoadFromDescriptionFile(msdfgen::Shape& shape, const char* descriptionFile, bool* skipColoring);
+    DLL_EXPORT bool MSDF_Shape_PreprocessGeometry(msdfgen::Shape& shape);
+    DLL_EXPORT bool MSDF_Shape_Validate(msdfgen::Shape& shape);
+    DLL_EXPORT bool MSDF_Shape_Export(msdfgen::Shape& shape, const char* fileName);
+    DLL_EXPORT void MSDF_Shape_Normalize(msdfgen::Shape& shape);
+    DLL_EXPORT void MSDF_Shape_FlipY(msdfgen::Shape& shape, bool flipped);
+    DLL_EXPORT bool MSDF_Shape_LoadFromFreetypeFont(msdfgen::Shape& shape, msdfgen::FontHandle *font, msdfgen::GlyphIndex glyphIndex, msdfgen::unicode_t unicode);
     
-    void MSDF_AutoFrame(MSDF& msdf);
+    DLL_EXPORT void MSDF_AutoFrame(MSDF& msdf);
 
-    msdfgen::BitmapBase* MSDF_Bitmap_Create(int channels, int width, int height);
+    DLL_EXPORT msdfgen::BitmapBase* MSDF_Bitmap_Create(int channels, int width, int height);
 
-    void MSDF_Bitmap_Delete(msdfgen::BitmapBase* bitmap);
+    DLL_EXPORT void MSDF_Bitmap_Delete(msdfgen::BitmapBase* bitmap);
     
-    void* MSDF_Bitmap_GetPixelData(msdfgen::BitmapBase& bitmap, int& width, int& height, int& channelCount);
+    DLL_EXPORT void* MSDF_Bitmap_GetPixelData(msdfgen::BitmapBase& bitmap, int& width, int& height, int& channelCount);
 
 
-    bool MSDF_TestRender(MSDF& msdf, msdfgen::Bitmap<float, 1>& output);
-    bool MSDF_TestRenderMulti(MSDF& msdf, msdfgen::BitmapBase& renderDestination);
-    bool MSDF_ApplyOrientation(MSDF& msdf);
+    DLL_EXPORT bool MSDF_TestRender(MSDF& msdf, msdfgen::Bitmap<float, 1>& output);
+    DLL_EXPORT bool MSDF_TestRenderMulti(MSDF& msdf, msdfgen::BitmapBase& renderDestination);
+    DLL_EXPORT bool MSDF_ApplyOrientation(MSDF& msdf);
 
-    bool MSDF_ApplyOutputDistanceShift(MSDF& msdf);
-    bool MSDF_ApplyScanlinePass(MSDF& msdf);
+    DLL_EXPORT bool MSDF_ApplyOutputDistanceShift(MSDF& msdf);
+    DLL_EXPORT bool MSDF_ApplyScanlinePass(MSDF& msdf);
 
-    bool MSDF_Save(MSDF& msdf, const char *filename, Format format);
+    DLL_EXPORT bool MSDF_Save(MSDF& msdf, const char *filename, Format format);
     
-    void MSDF_Initialize(MSDF& msdf, MSDF_MODE mode, int width, int height);
+    DLL_EXPORT void MSDF_Initialize(MSDF& msdf, MSDF_MODE mode, int width, int height);
     
-    msdfgen::Shape* MSDF_GetShape(MSDF& msdf);
-    msdfgen::BitmapBase* MSDF_GetData(MSDF& msdf);
+    DLL_EXPORT msdfgen::Shape* MSDF_GetShape(MSDF& msdf);
+    DLL_EXPORT msdfgen::BitmapBase* MSDF_GetData(MSDF& msdf);
     
-    void MSDF_ColorEdges(MSDF& msdf, edgeColoringFunc_t edgeColoring, unsigned long long coloringSeed, bool skipColoring, const char* edgeAssignment, double angleThreshold);
+    DLL_EXPORT void MSDF_ColorEdges(MSDF& msdf, edgeColoringFunc_t edgeColoring, unsigned long long coloringSeed, bool skipColoring, const char* edgeAssignment, double angleThreshold);
     
-    bool MSDF_Generate(MSDF& msdf);
+    DLL_EXPORT bool MSDF_Generate(MSDF& msdf);
     
-    bool MSDF_ConvertTo8Bit(MSDF& msdf);
+    DLL_EXPORT bool MSDF_ConvertTo8Bit(MSDF& msdf);
     
-    void MSDF_PrintMetrics(MSDF& msdf, bool autoFrame);
+    DLL_EXPORT void MSDF_PrintMetrics(MSDF& msdf, bool autoFrame);
     
-    MSDF* MSDF_Create(MSDF_MODE mode, int width, int height);
-    void MSDF_Delete(MSDF* msdf);
+    DLL_EXPORT MSDF* MSDF_Create(MSDF_MODE mode, int width, int height);
+    DLL_EXPORT void MSDF_Delete(MSDF* msdf);
     
-    const char* MSDF_GetErrorMessage();
+    DLL_EXPORT const char* MSDF_GetErrorMessage();
     
-    edgeColoringFunc_t MSDF_GetColoringStrategy(MSDF_COLORING_STRATEGY coloringStrategy);
+    DLL_EXPORT edgeColoringFunc_t MSDF_GetColoringStrategy(MSDF_COLORING_STRATEGY coloringStrategy);
     
 #ifdef __cplusplus
 }

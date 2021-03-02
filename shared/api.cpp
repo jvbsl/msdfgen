@@ -124,57 +124,6 @@ static bool cmpExtension(const char *path, const char *ext) {
 }
 
 template <int N>
-static const char * writeOutput(const msdfgen::BitmapConstRef<float, N> &bitmap, const char *filename, Format &format) {
-    if (filename) {
-        if (format == AUTO) {
-            if (cmpExtension(filename, ".png")) format = PNG;
-            else if (cmpExtension(filename, ".bmp")) format = BMP;
-            else if (cmpExtension(filename, ".tif") || cmpExtension(filename, ".tiff")) format = TIFF;
-            else if (cmpExtension(filename, ".txt")) format = TEXT;
-            else if (cmpExtension(filename, ".bin")) format = BINARY;
-            else
-                return "Could not deduce format from output file name.";
-        }
-        switch (format) {
-            case PNG: return msdfgen::savePng(bitmap, filename) ? NULL : "Failed to write output PNG image.";
-            case BMP: return msdfgen::saveBmp(bitmap, filename) ? NULL : "Failed to write output BMP image.";
-            case TIFF: return msdfgen::saveTiff(bitmap, filename) ? NULL : "Failed to write output TIFF image.";
-            case TEXT: case TEXT_FLOAT: {
-                FILE *file = fopen(filename, "w");
-                if (!file) return "Failed to write output text file.";
-                if (format == TEXT)
-                    writeTextBitmap(file, bitmap.pixels, N*bitmap.width, bitmap.height);
-                else if (format == TEXT_FLOAT)
-                    writeTextBitmapFloat(file, bitmap.pixels, N*bitmap.width, bitmap.height);
-                fclose(file);
-                return NULL;
-            }
-            case BINARY: case BINARY_FLOAT: case BINARY_FLOAT_BE: {
-                FILE *file = fopen(filename, "wb");
-                if (!file) return "Failed to write output binary file.";
-                if (format == BINARY)
-                    writeBinBitmap(file, bitmap.pixels, N*bitmap.width*bitmap.height);
-                else if (format == BINARY_FLOAT)
-                    writeBinBitmapFloat(file, bitmap.pixels, N*bitmap.width*bitmap.height);
-                else if (format == BINARY_FLOAT_BE)
-                    writeBinBitmapFloatBE(file, bitmap.pixels, N*bitmap.width*bitmap.height);
-                fclose(file);
-                return NULL;
-            }
-            default:;
-        }
-    } else {
-        if (format == AUTO || format == TEXT)
-            writeTextBitmap(stdout, bitmap.pixels, N*bitmap.width, bitmap.height);
-        else if (format == TEXT_FLOAT)
-            writeTextBitmapFloat(stdout, bitmap.pixels, N*bitmap.width, bitmap.height);
-        else
-            return "Unsupported format for standard output.";
-    }
-    return NULL;
-}
-
-template <int N>
 static void invertColor(const msdfgen::BitmapRef<float, N> &bitmap) {
     const float *end = bitmap.pixels+N*bitmap.width*bitmap.height;
     for (float *p = bitmap.pixels; p < end; ++p)
@@ -200,9 +149,82 @@ enum ERROR_CODES {
     MISMATCHING_BITMAP,
     ARGUMENT_OUT_OF_RANGE,
     INVALID_NULL_ARGUMENT,
+    OUTPUT_FORMAT_DEDUCTION_FAILED,
+    OUTPUT_WRITE_FAILED
 };
 
 void pushError(int);
+
+
+template <int N>
+bool writeOutput(const msdfgen::BitmapConstRef<float, N> &bitmap, const char *filename, Format &format) {
+    if (filename) {
+        if (format == AUTO) {
+            if (cmpExtension(filename, ".png")) format = PNG;
+            else if (cmpExtension(filename, ".bmp")) format = BMP;
+            else if (cmpExtension(filename, ".tif") || cmpExtension(filename, ".tiff")) format = TIFF;
+            else if (cmpExtension(filename, ".txt")) format = TEXT;
+            else if (cmpExtension(filename, ".bin")) format = BINARY;
+            else {
+                pushError(OUTPUT_FORMAT_DEDUCTION_FAILED);
+                return false;
+            }
+        }
+        switch (format) {
+            case PNG:
+                if (msdfgen::savePng(bitmap, filename))
+                    return true;
+                break;
+            case BMP: 
+                if (msdfgen::saveBmp(bitmap, filename))
+                    return true;
+                break;
+            case TIFF: 
+                if (msdfgen::saveTiff(bitmap, filename))
+                    return true;
+                break;
+            case TEXT: case TEXT_FLOAT: {
+                FILE *file = fopen(filename, "w");
+                if (!file) {
+                    pushError(OUTPUT_WRITE_FAILED);
+                    return false;
+                }
+                if (format == TEXT)
+                    writeTextBitmap(file, bitmap.pixels, N*bitmap.width, bitmap.height);
+                else if (format == TEXT_FLOAT)
+                    writeTextBitmapFloat(file, bitmap.pixels, N*bitmap.width, bitmap.height);
+                fclose(file);
+                return NULL;
+            }
+            case BINARY: case BINARY_FLOAT: case BINARY_FLOAT_BE: {
+                FILE *file = fopen(filename, "wb");
+                if (!file) {
+                    pushError(OUTPUT_WRITE_FAILED);
+                    return false;
+                }
+                if (format == BINARY)
+                    writeBinBitmap(file, bitmap.pixels, N*bitmap.width*bitmap.height);
+                else if (format == BINARY_FLOAT)
+                    writeBinBitmapFloat(file, bitmap.pixels, N*bitmap.width*bitmap.height);
+                else if (format == BINARY_FLOAT_BE)
+                    writeBinBitmapFloatBE(file, bitmap.pixels, N*bitmap.width*bitmap.height);
+                fclose(file);
+                return NULL;
+            }
+            default:;
+        }
+    } else {
+        if (format == AUTO || format == TEXT)
+            writeTextBitmap(stdout, bitmap.pixels, N*bitmap.width, bitmap.height);
+        else if (format == TEXT_FLOAT)
+            writeTextBitmapFloat(stdout, bitmap.pixels, N*bitmap.width, bitmap.height);
+        else
+            return "Unsupported format for standard output.";
+    }
+    pushError(OUTPUT_WRITE_FAILED);
+    return false;
+}
+
 
 template <typename T, int N>
 static bool TryConvertGenericBitmap(msdfgen::BitmapBase* bitmapBase, msdfgen::Bitmap<T, N>*& output) {
@@ -253,7 +275,9 @@ const char* errorMessages[] = {
     "Mismatching bitmap elment type",
     "Mismatching bitmap",
     "Argument out of range",
-    "Invalid passed null argument"
+    "Invalid passed null argument",
+    "Could not deduce format from output file name.",
+    "Failed to write output."
 };
 
 constexpr int MAX_ERROR_MESSAGES = 32;
@@ -503,22 +527,22 @@ bool MSDF_TestRender(MSDF& msdf, msdfgen::Bitmap<float, 1>& output) {
     double range = msdf.settings.normalizedRange();
     double avgScale = msdf.settings.averageScale();
     switch(msdf.mode) {
-        case MSDF_MODE::SINGLE:
-        case MSDF_MODE::PSEUDO: {
+        case SINGLE:
+        case PSEUDO: {
             msdfgen::Bitmap<float, 1>* data;
             if (!TryConvertGenericBitmap(msdf.data, data))
                 return false;
             renderSDF(output, *data, avgScale*range, .5f+msdf.settings.outputDistanceShift);
             break;
         }
-        case MSDF_MODE::MULTI: {
+        case MULTI: {
             msdfgen::Bitmap<float, 3>* data;
             if (!TryConvertGenericBitmap(msdf.data, data))
                 return false;
             renderSDF(output, *data, avgScale*range, .5f+msdf.settings.outputDistanceShift);
             break;
         }
-        case MSDF_MODE::MULTI_AND_TRUE: {
+        case MULTI_AND_TRUE: {
             msdfgen::Bitmap<float, 4>* data;
             if (!TryConvertGenericBitmap(msdf.data, data))
                 return false;
@@ -539,8 +563,8 @@ bool MSDF_TestRenderMulti(MSDF& msdf, msdfgen::BitmapBase& renderDestination) {
     auto destinationElementCount = renderDestination.elementsPerPixel();
     
     switch(msdf.mode) {
-        case MSDF_MODE::SINGLE:
-        case MSDF_MODE::PSEUDO: {
+        case SINGLE:
+        case PSEUDO: {
             if (destinationElementCount != 1)
                 return false;
                 
@@ -551,7 +575,7 @@ bool MSDF_TestRenderMulti(MSDF& msdf, msdfgen::BitmapBase& renderDestination) {
             renderSDF(dynamic_cast<msdfgen::Bitmap<float, 1>&>(renderDestination), *data, avgScale*range, .5f+msdf.settings.outputDistanceShift);
             break;
         }
-        case MSDF_MODE::MULTI: {
+        case MULTI: {
             if (destinationElementCount != 3)
                 return false;
             
@@ -563,7 +587,7 @@ bool MSDF_TestRenderMulti(MSDF& msdf, msdfgen::BitmapBase& renderDestination) {
             renderSDF(dynamic_cast<msdfgen::Bitmap<float, 3>&>(renderDestination), *data, avgScale*range, .5f+msdf.settings.outputDistanceShift);
             break;
         }
-        case MSDF_MODE::MULTI_AND_TRUE: {
+        case MULTI_AND_TRUE: {
             if (destinationElementCount != 4)
                 return false;
             
@@ -672,7 +696,6 @@ bool MSDF_ApplyScanlinePass(MSDF& msdf) {
 }
 
 bool MSDF_Save(MSDF& msdf, const char *filename, Format format) {
-    const char* error = "";
     switch (msdf.mode) {
         case SINGLE:
         case PSEUDO: {
@@ -680,7 +703,7 @@ bool MSDF_Save(MSDF& msdf, const char *filename, Format format) {
             if (!TryConvertGenericBitmap(msdf.data, data))
                 return false;
 
-            error = writeOutput<1>(*data, filename, format);
+            return writeOutput<1>(*data, filename, format);
             break;
         }
         case MULTI: {
@@ -688,7 +711,7 @@ bool MSDF_Save(MSDF& msdf, const char *filename, Format format) {
             if (!TryConvertGenericBitmap(msdf.data, data))
                 return false;
 
-            error = writeOutput<3>(*data, filename, format);
+            return writeOutput<3>(*data, filename, format);
             break;
         }
         case MULTI_AND_TRUE: {
@@ -696,12 +719,10 @@ bool MSDF_Save(MSDF& msdf, const char *filename, Format format) {
             if (!TryConvertGenericBitmap(msdf.data, data))
                 return false;
 
-            error = writeOutput<4>(*data, filename, format);
-            break;
+            return writeOutput<4>(*data, filename, format);
         }
         default:;
     }
-    printf(error);
     
     return true;
 }
@@ -786,9 +807,9 @@ msdfgen::BitmapBase* MSDF_GetData(MSDF& msdf) {
 
 edgeColoringFunc_t MSDF_GetColoringStrategy(MSDF_COLORING_STRATEGY coloringStrategy) {
     switch(coloringStrategy) {
-        case MSDF_COLORING_STRATEGY::SIMPLE:
+        case SIMPLE:
             return msdfgen::edgeColoringSimple;
-        case MSDF_COLORING_STRATEGY::INK_TRAP:
+        case INK_TRAP:
             return msdfgen::edgeColoringInkTrap;
     }
     pushError(ARGUMENT_OUT_OF_RANGE);
