@@ -2,16 +2,23 @@
 #pragma once
 
 #include <cstdlib>
+#include <cstdint>
 #include "../core/Shape.h"
+
+#ifdef _MSC_VER
+#define PACKED( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop))
+#else
+#define PACKED( __Declaration__ ) __Declaration__ __attribute__((__packed__))
+#endif
 
 namespace msdfgen {
 
-typedef unsigned unicode_t;
+typedef uint32_t unicode_t;
 
 class FreetypeHandle;
 class FontHandle;
 
-class GlyphIndex {
+PACKED(class GlyphIndex {
 
 public:
     explicit GlyphIndex(unsigned index = 0);
@@ -19,9 +26,9 @@ public:
     bool operator!() const;
 
 private:
-    unsigned index;
+    uint32_t index;
 
-};
+});
 
 /// Global metrics of a typeface (in font units).
 struct FontMetrics {

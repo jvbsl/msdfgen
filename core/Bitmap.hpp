@@ -7,28 +7,28 @@
 namespace msdfgen {
 
 template <typename T, int N>
-Bitmap<T, N>::Bitmap() : pixels(NULL), w(0), h(0) { }
+Bitmap<T, N>::Bitmap() : BitmapBase(0, 0, TypeToElementTypeMapping<T>::value, N), pixels(NULL) { }
 
 template <typename T, int N>
-Bitmap<T, N>::Bitmap(int width, int height) : w(width), h(height) {
+Bitmap<T, N>::Bitmap(int width, int height) : BitmapBase(width, height, TypeToElementTypeMapping<T>::value, N) {
     pixels = new T[N*w*h];
 }
 
 template <typename T, int N>
-Bitmap<T, N>::Bitmap(const BitmapConstRef<T, N> &orig) : w(orig.width), h(orig.height) {
+Bitmap<T, N>::Bitmap(const BitmapConstRef<T, N> &orig) : BitmapBase(orig.width, orig.height, TypeToElementTypeMapping<T>::value, N) {
     pixels = new T[N*w*h];
     memcpy(pixels, orig.pixels, sizeof(T)*N*w*h);
 }
 
 template <typename T, int N>
-Bitmap<T, N>::Bitmap(const Bitmap<T, N> &orig) : w(orig.w), h(orig.h) {
+Bitmap<T, N>::Bitmap(const Bitmap<T, N> &orig) : BitmapBase(orig.w, orig.h, TypeToElementTypeMapping<T>::value, N) {
     pixels = new T[N*w*h];
     memcpy(pixels, orig.pixels, sizeof(T)*N*w*h);
 }
 
 #ifdef MSDFGEN_USE_CPP11
 template <typename T, int N>
-Bitmap<T, N>::Bitmap(Bitmap<T, N> &&orig) : pixels(orig.pixels), w(orig.w), h(orig.h) {
+Bitmap<T, N>::Bitmap(Bitmap<T, N> &&orig) : BitmapBase(orig.w, orig.h, TypeToElementTypeMapping<T>::value, N), pixels(orig.pixels) {
     orig.pixels = NULL;
     orig.w = 0, orig.h = 0;
 }
@@ -73,16 +73,6 @@ Bitmap<T, N> & Bitmap<T, N>::operator=(Bitmap<T, N> &&orig) {
     return *this;
 }
 #endif
-
-template <typename T, int N>
-int Bitmap<T, N>::width() const {
-    return w;
-}
-
-template <typename T, int N>
-int Bitmap<T, N>::height() const {
-    return h;
-}
 
 template <typename T, int N>
 T * Bitmap<T, N>::operator()(int x, int y) {

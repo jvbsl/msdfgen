@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(msdfgen VERSION 1.8 LANGUAGES CXX)
 option(MSDFGEN_BUILD_MSDFGEN_STANDALONE "Build the msdfgen standalone executable" ON)
+option(MSDFGEN_BUILD_MSDFGEN_SHARED "Build the msdfgen shared library" ON)
 option(MSDFGEN_USE_OPENMP "Build with OpenMP support for multithreaded code" OFF)
 option(MSDFGEN_USE_CPP11 "Build with C++11 enabled" ON)
 option(MSDFGEN_USE_SKIA "Build with the Skia library" OFF)
@@ -34,6 +35,11 @@ file(GLOB_RECURSE msdfgen-ext_PUBLIC_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR
 	"ext/*.hpp"
 )
 
+file(GLOB_RECURSE msdfgen-shared_PUBLIC_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+	"shared/*.h"
+	"shared/*.hpp"
+)
+
 file(GLOB_RECURSE msdfgen-ext_PRIVATE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 	"include/*.h"
 )
@@ -56,6 +62,7 @@ folderize_sources(msdfgen-ext_SOURCES ${CMAKE_SOURCE_DIR})
 # Target configuration
 #----------------------------------------------------------------
 
+# Static lib
 add_library(msdfgen ${msdfgen_SOURCES} ${msdfgen_HEADERS} "./msdfgen.h")
 add_library(msdfgen::msdfgen ALIAS msdfgen)
 set_target_properties(msdfgen PROPERTIES PUBLIC_HEADER "${msdfgen_HEADERS}")
@@ -127,6 +134,38 @@ if(MSDFGEN_BUILD_MSDFGEN_STANDALONE)
 	endif()
 endif()
 
+# Build the shared library if requested
+if(MSDFGEN_BUILD_MSDFGEN_SHARED)
+    folderize_sources(msdfgen-shared_PUBLIC_HEADERS ${CMAKE_SOURCE_DIR})
+	add_library(msdfgen-shared SHARED shared/api.cpp ${msdfgen-shared_PUBLIC_HEADERS}  ${msdfgen_SOURCES} ${msdfgen_HEADERS} "./msdfgen.h" ${msdfgen-ext_SOURCES} ${msdfgen-ext_PUBLIC_HEADERS} ${msdfgen-ext_PRIVATE_HEADERS} "./msdfgen-ext.h")
+	target_include_directories(msdfgen-shared
+        PUBLIC
+	        $<INSTALL_INTERFACE:include>
+	        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../>
+	        
+        PRIVATE
+	        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        INTERFACE
+        	$<INSTALL_INTERFACE:include>
+	        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../>
+    )
+
+	set_property(TARGET msdfgen-shared PROPERTY POSITION_INDEPENDENT_CODE ON)
+	
+	set_target_properties(msdfgen-shared PROPERTIES ARCHIVE_OUTPUT_DIRECTORY archive OUTPUT_NAME msdfgen_shared)
+	target_compile_definitions(msdfgen-shared PRIVATE MSDFGEN_SHARED)
+    target_link_libraries(msdfgen-shared PUBLIC Freetype::Freetype)
+	if(FREETYPE_WITH_PNG)
+		find_package(ZLIB REQUIRED)
+		find_package(PNG REQUIRED)
+		target_link_libraries(msdfgen-shared PRIVATE ZLIB::ZLIB PNG::PNG)
+	endif()
+	if(FREETYPE_WITH_HARFBUZZ)
+		# No FindHarfBuzz.cmake available so falling back to CMAKE_LIBRARY_PATH
+		find_library(FREETYPE_HARFBUZZ_LIB "harfbuzz")
+		target_link_libraries(msdfgen-shared PRIVATE "${FREETYPE_HARFBUZZ_LIB}")
+	endif()
+endif()
 #----------------------------------------------------------------
 # Installation and exportation of the libraries
 #----------------------------------------------------------------
@@ -175,6 +214,17 @@ install(TARGETS msdfgen-ext EXPORT msdfgenTargets
 
 if(MSDFGEN_BUILD_MSDFGEN_STANDALONE)
 	install(TARGETS msdfgen-standalone EXPORT msdfgenTargets RUNTIME DESTINATION bin)
+endif()
+
+
+if(MSDFGEN_BUILD_MSDFGEN_SHARED)
+	install(TARGETS msdfgen-shared EXPORT msdfgenTargets
+	    RUNTIME DESTINATION bin
+	    LIBRARY DESTINATION lib
+	    ARCHIVE DESTINATION lib
+	    FRAMEWORK DESTINATION lib
+	    PUBLIC_HEADER DESTINATION include/msdfgen/shared
+    )
 endif()
 
 install(
