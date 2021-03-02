@@ -149,6 +149,10 @@ if(MSDFGEN_BUILD_MSDFGEN_SHARED)
         	$<INSTALL_INTERFACE:include>
 	        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../>
     )
+    if(MSDFGEN_USE_CPP11)
+	    target_compile_features(msdfgen-shared PUBLIC cxx_std_11)
+	    target_compile_definitions(msdfgen-shared PUBLIC MSDFGEN_USE_CPP11)
+    endif()
 
 	set_property(TARGET msdfgen-shared PROPERTY POSITION_INDEPENDENT_CODE ON)
 	

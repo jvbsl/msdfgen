@@ -55,16 +55,36 @@ enum MSDF_COLORING_STRATEGY {
 
 
 struct MSDFSettings {
-    MSDF_ORIENTATION orientation = MSDF_ORIENTATION::KEEP;
-    float outputDistanceShift = 0.0f;
+    MSDFSettings()
+        : orientation(MSDF_ORIENTATION::KEEP),
+          outputDistanceShift(0.0f),
+          translate(0.),
+          errorCorrectionThreshold(MSDFGEN_DEFAULT_ERROR_CORRECTION_THRESHOLD),
+          range(2),
+          fillRule(msdfgen::FillRule::FILL_NONZERO),
+          rangeMode(MSDF_RANGE_MODE::RANGE_PX),
+          scaleSpecified(false),
+          scale(1.),
+          legacyMode(false),
+          overlapSupport(false)
+    {
+    }
+    MSDF_ORIENTATION orientation;
+    float outputDistanceShift;
 
-    msdfgen::Vector2 translate = 0.;
-    double errorCorrectionThreshold = MSDFGEN_DEFAULT_ERROR_CORRECTION_THRESHOLD;
-    double range = 2;
+    msdfgen::Vector2 translate;
+    double errorCorrectionThreshold;
+    double range;
     
-    msdfgen::FillRule fillRule = msdfgen::FillRule::FILL_NONZERO;
+    msdfgen::FillRule fillRule;
     
-    MSDF_RANGE_MODE rangeMode = MSDF_RANGE_MODE::RANGE_PX;
+    MSDF_RANGE_MODE rangeMode;
+    
+    bool scaleSpecified;
+    msdfgen::Vector2 scale;
+    
+    bool legacyMode;
+    bool overlapSupport;
     
     double normalizedRange() {
         switch(rangeMode) {
@@ -81,13 +101,6 @@ struct MSDFSettings {
     double averageScale() {
         return 0.5*(scale.x+scale.y);
     }
-    
-    
-    bool scaleSpecified = false;
-    msdfgen::Vector2 scale = 1.;
-    
-    bool legacyMode = false;
-    bool overlapSupport = false;
 
 };
 
@@ -98,7 +111,7 @@ struct MSDFState {
 };
 
 struct MSDF {
-    MSDF() : data(nullptr) {}
+    MSDF() : state({}), data(nullptr) {}
     ~MSDF() {
         if (data != nullptr)
             delete data;

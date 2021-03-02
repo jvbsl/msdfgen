@@ -5,6 +5,13 @@
 
 namespace msdfgen {
 
+#ifdef MSDFGEN_USE_CPP11
+    #define CONSTEXPR constexpr
+#else
+    #define CONSTEXPR const
+#endif
+
+
 enum BITMAP_ELEMENT_TYPE {
     UNKNOWN,
     FLOAT,
@@ -12,27 +19,27 @@ enum BITMAP_ELEMENT_TYPE {
 };
 template<typename T>
 struct TypeToElementTypeMapping {
-    static constexpr BITMAP_ELEMENT_TYPE value = BITMAP_ELEMENT_TYPE::UNKNOWN;
+    static CONSTEXPR BITMAP_ELEMENT_TYPE value = BITMAP_ELEMENT_TYPE::UNKNOWN;
 };
 
 template<>
 struct TypeToElementTypeMapping<float> {
-    static constexpr BITMAP_ELEMENT_TYPE value = BITMAP_ELEMENT_TYPE::FLOAT;
+    static CONSTEXPR BITMAP_ELEMENT_TYPE value = BITMAP_ELEMENT_TYPE::FLOAT;
 };
 
 template<>
 struct TypeToElementTypeMapping<unsigned char> {
-    static constexpr BITMAP_ELEMENT_TYPE value = BITMAP_ELEMENT_TYPE::BYTE;
+    static CONSTEXPR BITMAP_ELEMENT_TYPE value = BITMAP_ELEMENT_TYPE::BYTE;
 };
 
 template<>
 struct TypeToElementTypeMapping<char> {
-    static constexpr BITMAP_ELEMENT_TYPE value = BITMAP_ELEMENT_TYPE::BYTE;
+    static CONSTEXPR BITMAP_ELEMENT_TYPE value = BITMAP_ELEMENT_TYPE::BYTE;
 };
-
+#undef CONSTEXPR
 class BitmapBase {
 public:
-    BitmapBase(int width, int height, BITMAP_ELEMENT_TYPE elementType, int elementsPerPixel) : w(width), h(height), eT(elementType), ePP(elementsPerPixel) {
+    BitmapBase(int width, int height, BITMAP_ELEMENT_TYPE elementType, int elementsPerPixel) : w(width), h(height), ePP(elementsPerPixel), eT(elementType) {
         switch(elementType) {
             case UNKNOWN:
                 break;
@@ -57,6 +64,8 @@ public:
     
     virtual void* pixelData() const = 0;
     
+    virtual ~BitmapBase() {}
+    
 protected:
     int w, h, ePP, eS;
     BITMAP_ELEMENT_TYPE eT;
@@ -74,7 +83,7 @@ public:
 #ifdef MSDFGEN_USE_CPP11
     Bitmap(Bitmap<T, N> &&orig);
 #endif
-    ~Bitmap();
+    virtual ~Bitmap();
     Bitmap<T, N> & operator=(const BitmapConstRef<T, N> &orig);
     Bitmap<T, N> & operator=(const Bitmap<T, N> &orig);
 #ifdef MSDFGEN_USE_CPP11
@@ -93,7 +102,11 @@ public:
     operator BitmapRef<T, N>();
     operator BitmapConstRef<T, N>() const;
 
+#ifdef MSDFGEN_USE_CPP11
     void* pixelData() const override { return pixels; }
+#else
+    void* pixelData() const { return pixels; }
+#endif
 private:
     T *pixels;
 

@@ -446,6 +446,7 @@ void MSDF_ColorEdges(MSDF& msdf, edgeColoringFunc_t edgeColoring, unsigned long 
                 edgeColoring(msdf.shape, angleThreshold, coloringSeed);
             if (edgeAssignment)
                 parseColoring(msdf.shape, edgeAssignment);
+        default:;
     }
 }
 bool MSDF_Generate(MSDF& msdf) {
@@ -524,6 +525,7 @@ bool MSDF_TestRender(MSDF& msdf, msdfgen::Bitmap<float, 1>& output) {
             renderSDF(output, *data, avgScale*range, .5f+msdf.settings.outputDistanceShift);
             break;
         }
+        default:;
     }
     return true;
 }
@@ -572,6 +574,7 @@ bool MSDF_TestRenderMulti(MSDF& msdf, msdfgen::BitmapBase& renderDestination) {
             renderSDF(dynamic_cast<msdfgen::Bitmap<float, 4>&>(renderDestination), *data, avgScale*range, .5f+msdf.settings.outputDistanceShift);
             break;
         }
+        default:;
     }
     
     return true;
@@ -696,6 +699,7 @@ bool MSDF_Save(MSDF& msdf, const char *filename, Format format) {
             error = writeOutput<4>(*data, filename, format);
             break;
         }
+        default:;
     }
     printf(error);
     
@@ -729,6 +733,7 @@ bool MSDF_ConvertTo8Bit(MSDF& msdf) {
             simulate8bit(*data);
             break;
         }
+        default:;
     }
     
     return true;
