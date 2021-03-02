@@ -58,6 +58,7 @@ Build() {
     # Create collected output directory for easy archiving
     mkdir ../complete/$OUTPUT_NAME/ 2> /dev/null | true
     cp $BUILD_DIR_PREFIX/msdfgen$executable_suffix ../complete/$OUTPUT_NAME/
+    cp $BUILD_DIR_PREFIX/*msdfgen_shared* ../complete/$OUTPUT_NAME/
     case $platform_suffix in
     "win")
         # Archive with powershell into zip
