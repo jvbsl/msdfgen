@@ -1,3 +1,6 @@
+### Version 1.8.1 (2021-03-03)
+
+- Added shared library
 
 ## Version 1.8 (2020-10-17)
 
