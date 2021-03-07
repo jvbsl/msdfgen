@@ -398,6 +398,15 @@ void MSDF_Shape_FlipY(msdfgen::Shape& shape, bool flipped) {
     shape.inverseYAxis = flipped;
 }
 
+void MSDF_Shape_GetBounds(msdfgen::Shape& shape, double& left, double& right, double& top, double& bottom) {
+
+    auto bounds = shape.getBounds();
+    left = bounds.l;
+    bottom = bounds.b;
+    right = bounds.r;
+    top = bounds.t;
+}
+
 
 void MSDF_AutoFrame(MSDF& msdf) {
     int width = msdf.state.width;
@@ -431,13 +440,19 @@ void MSDF_AutoFrame(MSDF& msdf) {
     if (msdf.settings.rangeMode == MSDF_RANGE_MODE::RANGE_PX && !msdf.settings.scaleSpecified)
         msdf.settings.translate += m*msdf.settings.range/msdf.settings.scale;
 }
-void MSDF_SetTranslation(MSDF& msdf, float x, float y) {
-    msdf.settings.translate.x = x;
-    msdf.settings.translate.y = y;
+void MSDF_SetTranslation(MSDF& msdf, double x, double y) {
+    msdf.settings.translate.set(x, y);
 }
-void MSDF_SetScale(MSDF& msdf, float x, float y) {
-    msdf.settings.scale.x = x;
-    msdf.settings.scale.y = y;
+void MSDF_SetScale(MSDF& msdf, double x, double y) {
+    msdf.settings.scale.set(x, y);
+}
+void MSDF_GetTranslation(MSDF& msdf, double& x, double& y) {
+    x = msdf.settings.translate.x;
+    y = msdf.settings.translate.y;
+}
+void MSDF_GetScale(MSDF& msdf, double& x, double& y) {
+    x = msdf.settings.scale.x;
+    y = msdf.settings.scale.y;
 }
 bool MSDF_Shape_Export(msdfgen::Shape& shape, const char* fileName) {
     FILE *file = fopen(fileName, "w");

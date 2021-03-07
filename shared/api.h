@@ -147,10 +147,13 @@ extern "C" {
     DLL_EXPORT void MSDF_Shape_Normalize(msdfgen::Shape& shape);
     DLL_EXPORT void MSDF_Shape_FlipY(msdfgen::Shape& shape, bool flipped);
     DLL_EXPORT bool MSDF_Shape_LoadFromFreetypeFont(msdfgen::Shape& shape, msdfgen::FontHandle *font, msdfgen::GlyphIndex glyphIndex, msdfgen::unicode_t unicode);
+    DLL_EXPORT void MSDF_Shape_GetBounds(msdfgen::Shape& shape, double& left, double& right, double& top, double& bottom);
     
     DLL_EXPORT void MSDF_AutoFrame(MSDF& msdf);
-    DLL_EXPORT void MSDF_SetTranslation(MSDF& msdf, float x, float y);
-    DLL_EXPORT void MSDF_SetScale(MSDF& msdf, float x, float y);
+    DLL_EXPORT void MSDF_SetTranslation(MSDF& msdf, double x, double y);
+    DLL_EXPORT void MSDF_SetScale(MSDF& msdf, double x, double y);
+    DLL_EXPORT void MSDF_GetTranslation(MSDF& msdf, double& x, double& y);
+    DLL_EXPORT void MSDF_GetScale(MSDF& msdf, double& x, double& y);
 
     DLL_EXPORT msdfgen::BitmapBase* MSDF_Bitmap_Create(int channels, int width, int height);
 

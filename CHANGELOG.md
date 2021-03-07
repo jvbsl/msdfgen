@@ -1,3 +1,9 @@
+### Version 1.8.3 (2021-03-03)
+
+- Added functions to get scaling and translation
+- Added functions to get shape bounds
+
+
 ### Version 1.8.2 (2021-03-03)
 
 - Added functions to modify scaling and translation
