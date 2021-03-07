@@ -1,3 +1,7 @@
+### Version 1.8.2 (2021-03-03)
+
+- Added functions to modify scaling and translation
+
 ### Version 1.8.1 (2021-03-03)
 
 - Added shared library

@@ -431,6 +431,14 @@ void MSDF_AutoFrame(MSDF& msdf) {
     if (msdf.settings.rangeMode == MSDF_RANGE_MODE::RANGE_PX && !msdf.settings.scaleSpecified)
         msdf.settings.translate += m*msdf.settings.range/msdf.settings.scale;
 }
+void MSDF_SetTranslation(MSDF& msdf, float x, float y) {
+    msdf.settings.translate.x = x;
+    msdf.settings.translate.y = y;
+}
+void MSDF_SetScale(MSDF& msdf, float x, float y) {
+    msdf.settings.scale.x = x;
+    msdf.settings.scale.y = y;
+}
 bool MSDF_Shape_Export(msdfgen::Shape& shape, const char* fileName) {
     FILE *file = fopen(fileName, "w");
     if (!file)
