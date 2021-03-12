@@ -454,6 +454,13 @@ void MSDF_GetScale(MSDF& msdf, double& x, double& y) {
     x = msdf.settings.scale.x;
     y = msdf.settings.scale.y;
 }
+
+void MSDF_SetRange(MSDF& msdf, double range) {
+    msdf.settings.range = range;
+}
+double MSDF_GetRange(MSDF& msdf) {
+    return msdf.settings.range;
+}
 bool MSDF_Shape_Export(msdfgen::Shape& shape, const char* fileName) {
     FILE *file = fopen(fileName, "w");
     if (!file)

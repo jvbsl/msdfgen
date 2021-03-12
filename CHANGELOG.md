@@ -1,3 +1,7 @@
+### Version 1.8.4 (2021-03-03)
+
+- Added function to get and set msdf range
+
 ### Version 1.8.3 (2021-03-03)
 
 - Added functions to get scaling and translation

@@ -70,7 +70,7 @@ struct MSDFSettings {
           outputDistanceShift(0.0f),
           translate(0.),
           errorCorrectionThreshold(MSDFGEN_DEFAULT_ERROR_CORRECTION_THRESHOLD),
-          range(2),
+          range(1),
           fillRule(msdfgen::FillRule::FILL_NONZERO),
           rangeMode(MSDF_RANGE_MODE::RANGE_PX),
           scaleSpecified(false),
@@ -154,6 +154,8 @@ extern "C" {
     DLL_EXPORT void MSDF_SetScale(MSDF& msdf, double x, double y);
     DLL_EXPORT void MSDF_GetTranslation(MSDF& msdf, double& x, double& y);
     DLL_EXPORT void MSDF_GetScale(MSDF& msdf, double& x, double& y);
+    DLL_EXPORT void MSDF_SetRange(MSDF& msdf, double range);
+    DLL_EXPORT double MSDF_GetRange(MSDF& msdf);
 
     DLL_EXPORT msdfgen::BitmapBase* MSDF_Bitmap_Create(int channels, int width, int height);
 
